@@ -6,6 +6,7 @@
 /** @var array|null $pib */
 /** @var array|null $pibPerCapita */
 /** @var array $populacaoSerie */
+/** @var array $mppaEstado */
 $pageTitle = 'Anuário Estatístico e Político do Pará';
 $page = 'home';
 require __DIR__ . '/partials/header.php';
@@ -21,7 +22,7 @@ function fmt_num($v, $decimais = 0) {
         <div class="row mb-2">
             <div class="col-sm-8">
                 <h1><i class="fas fa-map-location-dot"></i> Painel do Estado do Pará</h1>
-                <p class="text-muted">Escolha um município no mapa ou pela busca para ver o perfil completo: demografia, economia, social, território, meio ambiente, infraestrutura e política.</p>
+                <p class="text-muted">Escolha um município no mapa ou pela busca para ver o perfil completo: demografia, economia, social, território, meio ambiente, infraestrutura, política e Ministério Público.</p>
             </div>
             <div class="col-sm-4">
                 <div class="input-group mt-2">
@@ -139,6 +140,11 @@ function fmt_num($v, $decimais = 0) {
                             </a>
                         </li>
                     <?php $first = false; endforeach; ?>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tab-ministerio-publico" data-toggle="tab" href="#painel-ministerio-publico" role="tab">
+                            <i class="fas fa-scale-balanced"></i> Ministério Público
+                        </a>
+                    </li>
                 </ul>
                 <div class="tab-content pt-3" id="tema-demografia">
                     <?php $first = true; foreach ($mapas as $categoria => $itens): ?>
@@ -155,6 +161,71 @@ function fmt_num($v, $decimais = 0) {
                             </div>
                         </div>
                     <?php $first = false; endforeach; ?>
+
+                    <div class="tab-pane fade" id="painel-ministerio-publico">
+                        <p class="text-muted">Ministério Público do Estado do Pará (MPPA) — dados do Relatório de Atividades, ano base 2023/2024, submetido à ALEPA.</p>
+
+                        <?php foreach ($mppaEstado['indicadores'] as $categoria => $itens): ?>
+                            <h5 class="mt-3 border-bottom pb-1"><?= htmlspecialchars($categoria) ?></h5>
+                            <div class="row">
+                                <?php foreach ($itens as $ind): ?>
+                                    <?php
+                                        $unidade = $ind['unidade'] ?? '';
+                                        $decimais = $unidade === '%' ? 2 : ($unidade === 'R$' ? 0 : 0);
+                                        $valorFmt = ($unidade === 'R$' ? 'R$ ' : '') . fmt_num($ind['valor'], $decimais);
+                                    ?>
+                                    <div class="col-md-4 col-sm-6 mb-3">
+                                        <div class="stat-card">
+                                            <div class="rotulo"><?= htmlspecialchars($ind['indicador']) ?></div>
+                                            <div class="valor">
+                                                <?= $valorFmt ?>
+                                                <?php if ($unidade && $unidade !== 'R$'): ?><small class="text-muted"><?= htmlspecialchars($unidade) ?></small><?php endif; ?>
+                                                <small class="text-muted">(<?= htmlspecialchars((string)$ind['ano']) ?>)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <?php if ($mppaEstado['obras']): ?>
+                            <h5 class="mt-4 border-bottom pb-1">Sedes, obras e reformas por tipo</h5>
+                            <?php foreach ($mppaEstado['obras'] as $tipo => $itens): ?>
+                                <button class="btn btn-sm btn-outline-secondary mt-2 mr-1" type="button" data-toggle="collapse"
+                                        data-target="#obras-<?= md5($tipo) ?>">
+                                    <i class="fas fa-chevron-down"></i> <?= htmlspecialchars($tipo) ?> (<?= count($itens) ?>)
+                                </button>
+                                <div class="collapse mt-2" id="obras-<?= md5($tipo) ?>">
+                                    <p class="small">
+                                        <?php foreach ($itens as $i => $o): ?>
+                                            <a href="index.php?page=municipio&codigo=<?= htmlspecialchars($o['ibge_code']) ?>"><?= htmlspecialchars($o['municipio_nome']) ?></a><?= $o['titulo'] ? ' (' . htmlspecialchars($o['titulo']) . ')' : '' ?><?= $i < count($itens) - 1 ? ', ' : '' ?>
+                                        <?php endforeach; ?>
+                                    </p>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if ($mppaEstado['acoes']): ?>
+                            <h5 class="mt-4 border-bottom pb-1">Ações finalísticas por área <small class="text-muted">(âmbito estadual)</small></h5>
+                            <?php foreach ($mppaEstado['acoes'] as $area => $itens): ?>
+                                <button class="btn btn-sm btn-outline-success mt-2 mr-1" type="button" data-toggle="collapse"
+                                        data-target="#acoes-<?= md5($area) ?>">
+                                    <i class="fas fa-chevron-down"></i> <?= htmlspecialchars($area) ?> (<?= count($itens) ?>)
+                                </button>
+                                <div class="collapse mt-2" id="acoes-<?= md5($area) ?>">
+                                    <ul class="list-group list-group-flush mb-2">
+                                        <?php foreach ($itens as $item): ?>
+                                            <li class="list-group-item px-0 small"><?= htmlspecialchars($item['resumo']) ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <p class="footer-note text-muted small mt-4">
+                            Fonte: Relatório de Atividades do Ministério Público do Estado do Pará (MPPA), ano base 2023/2024, submetido à ALEPA.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

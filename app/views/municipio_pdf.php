@@ -2,6 +2,7 @@
 /** @var array $municipio */
 /** @var array $indicadores */
 /** @var array $politica */
+/** @var array $mppa */
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -70,6 +71,39 @@ ob_start();
     </tbody>
 </table>
 
+<h2>Ministério Público do Estado do Pará (MPPA)</h2>
+<?php if ($mppa['promotoria_instalada'] === true): ?>
+    <p>Possui Promotoria de Justiça instalada.</p>
+<?php elseif ($mppa['promotoria_instalada'] === false): ?>
+    <p>Ainda não possui Promotoria de Justiça instalada (situação vigente no relatório 2023/2024 do MPPA).</p>
+<?php endif; ?>
+<?php if ($mppa['obras']): ?>
+    <h3>Sedes, obras e reformas</h3>
+    <table>
+        <thead><tr><th>Ano</th><th>Tipo</th><th>Observação</th></tr></thead>
+        <tbody>
+        <?php foreach ($mppa['obras'] as $o): ?>
+            <tr>
+                <td><?= htmlspecialchars((string)$o['ano']) ?></td>
+                <td><?= htmlspecialchars($o['tipo']) ?></td>
+                <td><?= htmlspecialchars($o['titulo'] ?? '') ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+<?php if ($mppa['acoes']): ?>
+    <h3>Ações do MPPA que mencionam este município</h3>
+    <?php foreach ($mppa['acoes'] as $area => $itens): ?>
+        <p><strong><?= htmlspecialchars($area) ?></strong></p>
+        <ul>
+            <?php foreach ($itens as $item): ?>
+                <li><?= htmlspecialchars($item['resumo']) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endforeach; ?>
+<?php endif; ?>
+
 <?php foreach ($indicadores as $tema => $porSubtema): ?>
     <h2><?= htmlspecialchars($tema) ?></h2>
     <?php foreach ($porSubtema as $subtema => $porIndicador): ?>
@@ -95,7 +129,8 @@ ob_start();
 <?php endforeach; ?>
 
 <p class="footer-note">
-    Fontes: Anuário Estatístico do Pará 2025, Justiça Eleitoral/TSE (Eleições Municipais 2024), IBGE.
+    Fontes: Anuário Estatístico do Pará 2025, Justiça Eleitoral/TSE (Eleições Municipais 2024), IBGE,
+    Relatório de Atividades do MPPA (ano base 2023/2024).
     Relatório gerado automaticamente pelo Anuário do Pará — uso interno, não substitui as fontes oficiais.
 </p>
 

@@ -63,3 +63,42 @@ CREATE TABLE IF NOT EXISTS mapas_tematicos (
     ano       varchar(10)
 );
 CREATE INDEX IF NOT EXISTS idx_mapas_categoria ON mapas_tematicos(categoria);
+
+-- Ministério Público do Estado do Pará (MPPA) - Relatório de Atividades 2023/2024
+CREATE TABLE IF NOT EXISTS mppa_indicadores (
+    id           bigserial PRIMARY KEY,
+    municipio_id varchar(7) REFERENCES municipios(ibge_code) ON DELETE CASCADE,
+    escopo       varchar(20) NOT NULL DEFAULT 'ESTADO', -- MUNICIPIO | ESTADO
+    categoria    varchar(120) NOT NULL,
+    indicador    text NOT NULL,
+    ano          integer,
+    valor        numeric,
+    unidade      varchar(30)
+);
+CREATE INDEX IF NOT EXISTS idx_mppa_indicadores_municipio ON mppa_indicadores(municipio_id);
+CREATE INDEX IF NOT EXISTS idx_mppa_indicadores_escopo ON mppa_indicadores(escopo, categoria);
+
+CREATE TABLE IF NOT EXISTS mppa_obras (
+    id           bigserial PRIMARY KEY,
+    municipio_id varchar(7) NOT NULL REFERENCES municipios(ibge_code) ON DELETE CASCADE,
+    tipo         varchar(80) NOT NULL,
+    titulo       varchar(200),
+    ano          integer NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mppa_obras_municipio ON mppa_obras(municipio_id);
+
+CREATE TABLE IF NOT EXISTS mppa_acoes (
+    id     bigserial PRIMARY KEY,
+    area   varchar(120) NOT NULL,
+    escopo varchar(20) NOT NULL DEFAULT 'ESTADO', -- MUNICIPIO | ESTADO
+    ano    integer,
+    resumo text NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mppa_acoes_area ON mppa_acoes(area);
+
+CREATE TABLE IF NOT EXISTS mppa_acoes_municipios (
+    acao_id      bigint NOT NULL REFERENCES mppa_acoes(id) ON DELETE CASCADE,
+    municipio_id varchar(7) NOT NULL REFERENCES municipios(ibge_code) ON DELETE CASCADE,
+    PRIMARY KEY (acao_id, municipio_id)
+);
+CREATE INDEX IF NOT EXISTS idx_mppa_acoes_municipios_municipio ON mppa_acoes_municipios(municipio_id);

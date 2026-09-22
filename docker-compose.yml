@@ -33,6 +33,7 @@ services:
       - "./Anuário_2025:/sources/anuario:ro"
       - "./Relatorio_Resultado_Totalizacao_2024_PA:/sources/pdfs:ro"
       - ./mapas:/sources/mapas:ro
+      - ./mppa:/sources/mppa:ro
       - mapas_publicos:/output/mapas
     restart: "no"
 

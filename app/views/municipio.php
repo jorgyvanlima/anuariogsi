@@ -2,6 +2,7 @@
 /** @var array $municipio */
 /** @var array $indicadores */
 /** @var array $politica */
+/** @var array $mppa */
 $pageTitle = $municipio['nome'] . ' — Anuário do Pará';
 $page = 'municipio';
 require __DIR__ . '/partials/header.php';
@@ -65,6 +66,11 @@ $chartPayload = [];
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" href="#pane-politica" role="tab">
                             <i class="fas fa-landmark-dome"></i> Política
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#pane-mppa" role="tab">
+                            <i class="fas fa-scale-balanced"></i> Ministério Público
                         </a>
                     </li>
                 </ul>
@@ -220,6 +226,51 @@ $chartPayload = [];
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="pane-mppa">
+                        <?php if ($mppa['promotoria_instalada'] === true): ?>
+                            <div class="alert alert-success"><i class="fas fa-circle-check"></i> Município possui Promotoria de Justiça instalada.</div>
+                        <?php elseif ($mppa['promotoria_instalada'] === false): ?>
+                            <div class="alert alert-warning"><i class="fas fa-triangle-exclamation"></i> Município ainda não possui Promotoria de Justiça instalada (situação vigente no relatório 2023/2024 do MPPA).</div>
+                        <?php else: ?>
+                            <div class="alert alert-light border"><i class="fas fa-circle-question"></i> Situação da Promotoria de Justiça não informada para este município.</div>
+                        <?php endif; ?>
+
+                        <?php if ($mppa['obras']): ?>
+                            <h5 class="mt-4">Sedes, obras e reformas</h5>
+                            <table class="table table-sm table-striped">
+                                <thead><tr><th>Ano</th><th>Tipo</th><th>Observação</th></tr></thead>
+                                <tbody>
+                                <?php foreach ($mppa['obras'] as $o): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars((string)$o['ano']) ?></td>
+                                        <td><?= htmlspecialchars($o['tipo']) ?></td>
+                                        <td><?= htmlspecialchars($o['titulo'] ?? '') ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+
+                        <?php if ($mppa['acoes']): ?>
+                            <h5 class="mt-4">Ações do MPPA que mencionam este município <small class="text-muted">(Relatório de Atividades 2023)</small></h5>
+                            <?php foreach ($mppa['acoes'] as $area => $itens): ?>
+                                <h6 class="mt-3 text-success"><?= htmlspecialchars($area) ?></h6>
+                                <ul class="list-group list-group-flush mb-2">
+                                    <?php foreach ($itens as $item): ?>
+                                        <li class="list-group-item px-0"><?= htmlspecialchars($item['resumo']) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted mt-3">Nenhuma ação específica deste município foi identificada no texto do relatório — isso não significa ausência de atuação do MPPA, apenas que o relatório não citou o município nominalmente.</p>
+                        <?php endif; ?>
+
+                        <p class="footer-note text-muted small mt-4">
+                            Fonte: Relatório de Atividades do Ministério Público do Estado do Pará (MPPA), ano base 2023/2024, submetido à ALEPA.
+                            As ações por município foram identificadas automaticamente a partir do texto do relatório e podem não ser exaustivas.
+                        </p>
                     </div>
                 </div>
             </div>
