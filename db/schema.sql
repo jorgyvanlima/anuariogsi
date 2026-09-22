@@ -116,11 +116,11 @@ CREATE TABLE IF NOT EXISTS pcpa_unidades (
     id            bigserial PRIMARY KEY,
     municipio_id  varchar(7) REFERENCES municipios(ibge_code) ON DELETE CASCADE,
     tipo          varchar(60) NOT NULL,
-    nome          varchar(300) NOT NULL,
+    nome          text NOT NULL,
     endereco      text,
-    bairro        varchar(150),
+    bairro        text,
     telefone      text,
-    funcionamento varchar(120)
+    funcionamento text
 );
 CREATE INDEX IF NOT EXISTS idx_pcpa_unidades_municipio ON pcpa_unidades(municipio_id);
 CREATE INDEX IF NOT EXISTS idx_pcpa_unidades_tipo ON pcpa_unidades(tipo);
