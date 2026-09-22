@@ -30,3 +30,4 @@ data/geo/*.tmp
 /Anuário_2025/Anuário_2025.xlsx
 
 *.DS_Store
+Thumbs.db
