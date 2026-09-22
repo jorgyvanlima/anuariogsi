@@ -1,0 +1,49 @@
+/* Garante o layout "push" do AdminLTE (sidebar fixa + conteúdo deslocado),
+   independente de timing/estado do JS de PushMenu. */
+.main-sidebar {
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}
+@media (min-width: 992px) {
+    .content-wrapper,
+    .main-footer {
+        margin-left: 250px !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .content-wrapper,
+    .main-footer {
+        margin-left: 0 !important;
+    }
+}
+
+#mapa-pa {
+    background: #eef6f1;
+}
+
+.small-box .icon {
+    opacity: 0.35;
+}
+
+.leaflet-container {
+    font-family: inherit;
+}
+
+.stat-card {
+    border-left: 4px solid #0b5d3b;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #fff;
+}
+
+.stat-card .valor {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.stat-card .rotulo {
+    font-size: 0.8rem;
+    color: #6c757d;
+}

@@ -1,0 +1,21 @@
+# Dados brutos são montados via volume nos serviços que precisam deles (etl);
+# não fazem parte do contexto de build de nenhuma imagem.
+Anuário_2025/
+Relatorio_Resultado_Totalizacao_2024_PA/
+Historico_Totalizacao_Presidente_BR_1T_2022/
+Historico_Totalizacao_Presidente_BR_2T_2022/
+detalhe_votacao_munzona_2022/
+detalhe_votacao_munzona_2024/
+detalhe_votacao_secao_2022/
+detalhe_votacao_secao_2024/
+votacao_candidato_munzona_2022/
+votacao_partido_munzona_2024/
+votacao_partido_munzona_2024 2/
+votacao_secao_2022_BR/
+votacao_secao_2024_PA/
+mapas/
+
+.git/
+app/vendor/
+pgdata/
+*.DS_Store

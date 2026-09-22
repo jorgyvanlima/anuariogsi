@@ -1,0 +1,32 @@
+# segredos / config local
+.env
+
+# gerado no build da imagem (composer install)
+app/vendor/
+
+# volumes/estado local do Docker
+pgdata/
+data/geo/*.tmp
+
+# --- pastas de dados brutos que NÃO fazem parte deste projeto (Anuário) ---
+# ficam na mesma pasta de trabalho mas pertencem a outra análise eleitoral;
+# o app usa apenas Anuário_2025/, Relatorio_Resultado_Totalizacao_2024_PA/ e mapas/
+/Historico_Totalizacao_Presidente_BR_1T_2022/
+/Historico_Totalizacao_Presidente_BR_2T_2022/
+/detalhe_votacao_munzona_2022/
+/detalhe_votacao_munzona_2024/
+/detalhe_votacao_secao_2022/
+/detalhe_votacao_secao_2024/
+/votacao_candidato_munzona_2022/
+/votacao_partido_munzona_2024/
+/votacao_partido_munzona_2024 2/
+/votacao_secao_2022_BR/
+/votacao_secao_2024_PA/
+
+# --- Anuário_2025: versão bruta é grande (134MB, acima do limite do GitHub);
+# o repositório guarda só a versão comprimida (Anuário_2025.csv.gz, ~8MB),
+# que o ETL lê diretamente. O .xlsx é redundante com o .csv e não é usado.
+/Anuário_2025/Anuário_2025.csv
+/Anuário_2025/Anuário_2025.xlsx
+
+*.DS_Store
