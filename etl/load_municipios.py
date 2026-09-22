@@ -1,17 +1,27 @@
 """Carrega a tabela `municipios` a partir da lista oficial do IBGE (144 municípios do Pará)
 e enriquece com a Região de Integração declarada no Anuário_2025."""
 import csv
+import gzip
 import json
+import os
 
 from lib.normalize import normalize
 
 IBGE_JSON = "/data_static/pa_municipios_ibge.json"
-ANUARIO_CSV = "/sources/anuario/Anuário_2025.csv"
+ANUARIO_DIR = "/sources/anuario"
+ANUARIO_CSV_GZ = os.path.join(ANUARIO_DIR, "Anuário_2025.csv.gz")
+ANUARIO_CSV_PLAIN = os.path.join(ANUARIO_DIR, "Anuário_2025.csv")
+
+
+def open_anuario():
+    if os.path.exists(ANUARIO_CSV_GZ):
+        return gzip.open(ANUARIO_CSV_GZ, mode="rt", encoding="utf-8", newline="")
+    return open(ANUARIO_CSV_PLAIN, encoding="utf-8", newline="")
 
 
 def load_regioes_integracao():
     ri_by_norm_name = {}
-    with open(ANUARIO_CSV, encoding="utf-8") as f:
+    with open_anuario() as f:
         reader = csv.DictReader(f)
         for row in reader:
             loc = row["localidade"]
