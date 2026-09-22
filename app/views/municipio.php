@@ -237,6 +237,25 @@ $chartPayload = [];
                             <div class="alert alert-light border"><i class="fas fa-circle-question"></i> Situação da Promotoria de Justiça não informada para este município.</div>
                         <?php endif; ?>
 
+                        <?php if ($mppa['contato']): ?>
+                            <h5 class="mt-4">Contato da Promotoria de Justiça</h5>
+                            <div class="card card-outline card-secondary">
+                                <div class="card-body">
+                                    <?php if ($mppa['contato']['entrancia']): ?>
+                                        <p class="mb-1"><strong>Entrância:</strong> <?= htmlspecialchars($mppa['contato']['entrancia']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($mppa['contato']['endereco']): ?>
+                                        <p class="mb-1"><i class="fas fa-location-dot"></i> <?= htmlspecialchars($mppa['contato']['endereco']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($mppa['contato']['telefones']): ?>
+                                        <p class="mb-0"><i class="fas fa-phone"></i>
+                                            <?= implode('<br>', array_map('htmlspecialchars', array_map('trim', explode('|', $mppa['contato']['telefones'])))) ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <?php if ($mppa['obras']): ?>
                             <h5 class="mt-4">Sedes, obras e reformas</h5>
                             <table class="table table-sm table-striped">
@@ -268,8 +287,10 @@ $chartPayload = [];
                         <?php endif; ?>
 
                         <p class="footer-note text-muted small mt-4">
-                            Fonte: Relatório de Atividades do Ministério Público do Estado do Pará (MPPA), ano base 2023/2024, submetido à ALEPA.
-                            As ações por município foram identificadas automaticamente a partir do texto do relatório e podem não ser exaustivas.
+                            Fontes: Relatório de Atividades do MPPA (ano base 2023/2024, submetido à ALEPA) e lista de contatos das
+                            Promotorias de Justiça do Interior. As ações por município e os dados de contato foram extraídos
+                            automaticamente dos documentos originais e podem conter imprecisões, sobretudo em municípios que
+                            dividem comarca/termo judiciário com outro.
                         </p>
                     </div>
                 </div>

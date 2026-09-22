@@ -25,6 +25,7 @@ try {
             $politica = CandidatoRepository::politicaDoMunicipio($codigo);
             $mppa = [
                 'promotoria_instalada' => MppaRepository::promotoriaInstalada($codigo),
+                'contato' => MppaRepository::contatoPorMunicipio($codigo),
                 'obras' => MppaRepository::obrasPorMunicipio($codigo),
                 'acoes' => MppaRepository::acoesPorMunicipio($codigo),
             ];

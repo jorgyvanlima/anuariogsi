@@ -47,6 +47,16 @@ final class MppaRepository
         return $valor === false ? null : ((float) $valor > 0);
     }
 
+    public static function contatoPorMunicipio(string $ibgeCode): ?array
+    {
+        $stmt = Database::connection()->prepare(
+            "SELECT entrancia, endereco, telefones FROM mppa_contatos WHERE municipio_id = :code"
+        );
+        $stmt->execute(['code' => $ibgeCode]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function obrasPorMunicipio(string $ibgeCode): array
     {
         $stmt = Database::connection()->prepare(

@@ -102,3 +102,11 @@ CREATE TABLE IF NOT EXISTS mppa_acoes_municipios (
     PRIMARY KEY (acao_id, municipio_id)
 );
 CREATE INDEX IF NOT EXISTS idx_mppa_acoes_municipios_municipio ON mppa_acoes_municipios(municipio_id);
+
+CREATE TABLE IF NOT EXISTS mppa_contatos (
+    id           bigserial PRIMARY KEY,
+    municipio_id varchar(7) NOT NULL UNIQUE REFERENCES municipios(ibge_code) ON DELETE CASCADE,
+    entrancia    varchar(40),
+    endereco     text,
+    telefones    text
+);

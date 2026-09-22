@@ -77,6 +77,14 @@ ob_start();
 <?php elseif ($mppa['promotoria_instalada'] === false): ?>
     <p>Ainda não possui Promotoria de Justiça instalada (situação vigente no relatório 2023/2024 do MPPA).</p>
 <?php endif; ?>
+<?php if ($mppa['contato']): ?>
+    <h3>Contato da Promotoria de Justiça</h3>
+    <p>
+        <?php if ($mppa['contato']['entrancia']): ?><strong><?= htmlspecialchars($mppa['contato']['entrancia']) ?></strong><br><?php endif; ?>
+        <?= htmlspecialchars($mppa['contato']['endereco'] ?? '') ?><br>
+        <?= nl2br(htmlspecialchars(str_replace('|', "\n", $mppa['contato']['telefones'] ?? ''))) ?>
+    </p>
+<?php endif; ?>
 <?php if ($mppa['obras']): ?>
     <h3>Sedes, obras e reformas</h3>
     <table>

@@ -21,11 +21,14 @@ import re
 import subprocess
 import tempfile
 
+import pdfplumber
+
 from lib.mppa_data import INDICADORES_ESTADO, MUNICIPIOS_SEM_PROMOTORIA, MPPA_ALIAS_MUNICIPIO, OBRAS
 from lib.normalize import normalize
 
 SRC_DIR = "/sources/mppa"
 RELATORIO_PDF = os.path.join(SRC_DIR, "Relatorio ALEPA - ano base 2023 DEFINITIVO. Artes Graficas.pdf")
+CONTATOS_PDF = os.path.join(SRC_DIR, "PJ_DO_INTERIOR_DO_ESTADO.pdf")
 
 ANO_RELATORIO = 2023
 
@@ -271,6 +274,89 @@ def _load_acoes_narrativas(cur, by_norm):
     return total_acoes, total_com_municipio
 
 
+COL_A_MAX = 120  # coluna do nome do município / entrância
+COL_B_MAX = 320  # coluna do endereço (entre COL_A_MAX e COL_B_MAX)
+                 # coluna dos telefones: x0 >= COL_B_MAX
+ENTRANCIA_RE = re.compile(r"ENTR[ÂA]NCIA", re.I)
+MIN_CONTATO_LEN = 5  # descarta blocos sem endereço nem telefone (ex.: quebra de página)
+
+
+def _group_lines_by_top(words, tol=3):
+    """Agrupa palavras (já ordenadas por leitura) em linhas de texto, unindo
+    palavras cujo 'top' (posição vertical) difere no máximo `tol` pixels."""
+    lines = []
+    for w in sorted(words, key=lambda w: (w["top"], w["x0"])):
+        if lines and abs(lines[-1][0] - w["top"]) <= tol:
+            lines[-1] = (lines[-1][0], lines[-1][1] + " " + w["text"])
+        else:
+            lines.append((w["top"], w["text"]))
+    return lines
+
+
+def _load_contatos_interior(cur, by_norm):
+    """PJ_DO_INTERIOR_DO_ESTADO.pdf é uma lista de contatos em 3 colunas visuais
+    (município/entrância | endereço | telefones) sem estrutura tabular real no
+    texto (pdftotext embaralha as colunas). Em vez de tentar reconstruir linhas de
+    texto, usa a posição geométrica (x0/top) de cada palavra via pdfplumber: agrupa
+    por coluna pela posição horizontal, identifica o início de cada bloco de
+    município pela coluna da esquerda, e recorta o texto das outras duas colunas
+    pela faixa vertical (top) daquele bloco até o início do próximo município."""
+    if not os.path.isfile(CONTATOS_PDF):
+        print("[mppa] PDF de contatos do interior não encontrado, pulando.")
+        return 0
+
+    total = 0
+    with pdfplumber.open(CONTATOS_PDF) as pdf:
+        for page in pdf.pages:
+            words = page.extract_words(use_text_flow=False, keep_blank_chars=False)
+            col_a = [w for w in words if w["x0"] < COL_A_MAX]
+            col_b = [w for w in words if COL_A_MAX <= w["x0"] < COL_B_MAX]
+            col_c = [w for w in words if w["x0"] >= COL_B_MAX]
+
+            lines_a = _group_lines_by_top(col_a)
+
+            muni_starts = []  # (top, ibge_code, nome_oficial)
+            for top, text in lines_a:
+                match = by_norm.get(normalize(text))
+                if match:
+                    muni_starts.append((top, match[0], match[1]))
+            if not muni_starts:
+                continue
+
+            for i, (top, ibge_code, _nome) in enumerate(muni_starts):
+                top_end = muni_starts[i + 1][0] if i + 1 < len(muni_starts) else page.height
+
+                entrancia = None
+                for t2, text2 in lines_a:
+                    if top <= t2 < top_end and ENTRANCIA_RE.search(text2):
+                        entrancia = text2.strip()
+                        break
+
+                end_words = [w for w in col_b if top - 2 <= w["top"] < top_end]
+                endereco = " ".join(t for _, t in _group_lines_by_top(end_words))
+
+                tel_words = [w for w in col_c if top - 2 <= w["top"] < top_end]
+                telefones = " | ".join(t for _, t in _group_lines_by_top(tel_words))
+
+                if len(endereco) + len(telefones) < MIN_CONTATO_LEN:
+                    continue
+
+                cur.execute(
+                    """
+                    INSERT INTO mppa_contatos (municipio_id, entrancia, endereco, telefones)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (municipio_id) DO UPDATE SET
+                        entrancia = EXCLUDED.entrancia,
+                        endereco = EXCLUDED.endereco,
+                        telefones = EXCLUDED.telefones
+                    """,
+                    (ibge_code, entrancia, endereco, telefones),
+                )
+                total += 1
+
+    return total
+
+
 def run(conn):
     cur = conn.cursor()
 
@@ -278,6 +364,7 @@ def run(conn):
     cur.execute("DELETE FROM mppa_acoes")
     cur.execute("DELETE FROM mppa_obras")
     cur.execute("DELETE FROM mppa_indicadores")
+    cur.execute("DELETE FROM mppa_contatos")
 
     by_norm = _build_municipio_lookup(conn)
 
@@ -285,9 +372,11 @@ def run(conn):
     n_promotoria = _load_promotoria_status(cur, by_norm)
     n_obras = _load_obras(cur, by_norm)
     n_acoes, n_acoes_municipio = _load_acoes_narrativas(cur, by_norm)
+    n_contatos = _load_contatos_interior(cur, by_norm)
 
     conn.commit()
     print(
         f"[mppa] {n_indicadores} indicadores estaduais, {n_promotoria} municípios com status de promotoria, "
-        f"{n_obras} obras/sedes, {n_acoes} ações extraídas do relatório ({n_acoes_municipio} vinculadas a município)."
+        f"{n_obras} obras/sedes, {n_acoes} ações extraídas do relatório ({n_acoes_municipio} vinculadas a município), "
+        f"{n_contatos} contatos de Promotorias do interior."
     )
