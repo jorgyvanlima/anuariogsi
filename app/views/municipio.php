@@ -3,6 +3,7 @@
 /** @var array $indicadores */
 /** @var array $politica */
 /** @var array $mppa */
+/** @var array $pcpa */
 $pageTitle = $municipio['nome'] . ' — Anuário do Pará';
 $page = 'municipio';
 require __DIR__ . '/partials/header.php';
@@ -71,6 +72,11 @@ $chartPayload = [];
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" href="#pane-mppa" role="tab">
                             <i class="fas fa-scale-balanced"></i> Ministério Público
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#pane-pcpa" role="tab">
+                            <i class="fas fa-shield-halved"></i> Polícia Civil
                         </a>
                     </li>
                 </ul>
@@ -291,6 +297,39 @@ $chartPayload = [];
                             Promotorias de Justiça do Interior. As ações por município e os dados de contato foram extraídos
                             automaticamente dos documentos originais e podem conter imprecisões, sobretudo em municípios que
                             dividem comarca/termo judiciário com outro.
+                        </p>
+                    </div>
+
+                    <div class="tab-pane fade" id="pane-pcpa">
+                        <?php if ($pcpa): ?>
+                            <?php foreach ($pcpa as $u): ?>
+                                <div class="card card-outline card-secondary mb-2">
+                                    <div class="card-body py-2">
+                                        <h6 class="mb-1">
+                                            <span class="badge badge-secondary"><?= htmlspecialchars($u['tipo']) ?></span>
+                                            <?= htmlspecialchars($u['nome']) ?>
+                                        </h6>
+                                        <?php if ($u['endereco']): ?>
+                                            <p class="mb-1 small"><i class="fas fa-location-dot"></i>
+                                                <?= htmlspecialchars($u['endereco']) ?><?= $u['bairro'] ? ' — ' . htmlspecialchars($u['bairro']) : '' ?>
+                                            </p>
+                                        <?php endif; ?>
+                                        <?php if ($u['telefone']): ?>
+                                            <p class="mb-1 small"><i class="fas fa-phone"></i> <?= htmlspecialchars($u['telefone']) ?></p>
+                                        <?php endif; ?>
+                                        <?php if ($u['funcionamento']): ?>
+                                            <p class="mb-0 small text-muted"><i class="fas fa-clock"></i> <?= htmlspecialchars($u['funcionamento']) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted mt-3">Nenhuma unidade da Polícia Civil identificada para este município nesta fonte.</p>
+                        <?php endif; ?>
+
+                        <p class="footer-note text-muted small mt-4">
+                            Fonte: Polícia Civil do Estado do Pará — Unidades Policiais (pc.pa.gov.br/delegacias).
+                            Dados extraídos automaticamente por OCR e podem conter pequenas imprecisões.
                         </p>
                     </div>
                 </div>

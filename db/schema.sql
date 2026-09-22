@@ -110,3 +110,17 @@ CREATE TABLE IF NOT EXISTS mppa_contatos (
     endereco     text,
     telefones    text
 );
+
+-- Polícia Civil do Pará (PCPA) - Unidades Policiais (pc.pa.gov.br/delegacias)
+CREATE TABLE IF NOT EXISTS pcpa_unidades (
+    id            bigserial PRIMARY KEY,
+    municipio_id  varchar(7) REFERENCES municipios(ibge_code) ON DELETE CASCADE,
+    tipo          varchar(60) NOT NULL,
+    nome          varchar(300) NOT NULL,
+    endereco      text,
+    bairro        varchar(150),
+    telefone      text,
+    funcionamento varchar(120)
+);
+CREATE INDEX IF NOT EXISTS idx_pcpa_unidades_municipio ON pcpa_unidades(municipio_id);
+CREATE INDEX IF NOT EXISTS idx_pcpa_unidades_tipo ON pcpa_unidades(tipo);

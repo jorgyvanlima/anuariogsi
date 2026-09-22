@@ -34,6 +34,7 @@ services:
       - "./Relatorio_Resultado_Totalizacao_2024_PA:/sources/pdfs:ro"
       - ./mapas:/sources/mapas:ro
       - ./mppa:/sources/mppa:ro
+      - ./pcpa:/sources/pcpa:ro
       - mapas_publicos:/output/mapas
     restart: "no"
 

@@ -7,6 +7,7 @@ require_once __DIR__ . '/../src/Repository/IndicadorRepository.php';
 require_once __DIR__ . '/../src/Repository/CandidatoRepository.php';
 require_once __DIR__ . '/../src/Repository/MapaRepository.php';
 require_once __DIR__ . '/../src/Repository/MppaRepository.php';
+require_once __DIR__ . '/../src/Repository/PcpaRepository.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $page = $_GET['page'] ?? 'home';
@@ -29,6 +30,7 @@ try {
                 'obras' => MppaRepository::obrasPorMunicipio($codigo),
                 'acoes' => MppaRepository::acoesPorMunicipio($codigo),
             ];
+            $pcpa = PcpaRepository::porMunicipio($codigo);
 
             if (($_GET['export'] ?? '') === 'pdf') {
                 require __DIR__ . '/../views/municipio_pdf.php';
@@ -51,6 +53,7 @@ try {
                 'obras' => MppaRepository::obrasEstado(),
                 'acoes' => MppaRepository::acoesEstado(),
             ];
+            $pcpaEstado = PcpaRepository::todasAgrupadasPorTipo();
             require __DIR__ . '/../views/home.php';
             break;
     }

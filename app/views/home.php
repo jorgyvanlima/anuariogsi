@@ -7,6 +7,7 @@
 /** @var array|null $pibPerCapita */
 /** @var array $populacaoSerie */
 /** @var array $mppaEstado */
+/** @var array $pcpaEstado */
 $pageTitle = 'Anuário Estatístico e Político do Pará';
 $page = 'home';
 require __DIR__ . '/partials/header.php';
@@ -22,7 +23,7 @@ function fmt_num($v, $decimais = 0) {
         <div class="row mb-2">
             <div class="col-sm-8">
                 <h1><i class="fas fa-map-location-dot"></i> Painel do Estado do Pará</h1>
-                <p class="text-muted">Escolha um município no mapa ou pela busca para ver o perfil completo: demografia, economia, social, território, meio ambiente, infraestrutura, política e Ministério Público.</p>
+                <p class="text-muted">Escolha um município no mapa ou pela busca para ver o perfil completo: demografia, economia, social, território, meio ambiente, infraestrutura, política, Ministério Público e Polícia Civil.</p>
             </div>
             <div class="col-sm-4">
                 <div class="input-group mt-2">
@@ -145,6 +146,11 @@ function fmt_num($v, $decimais = 0) {
                             <i class="fas fa-scale-balanced"></i> Ministério Público
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tab-policia-civil" data-toggle="tab" href="#painel-policia-civil" role="tab">
+                            <i class="fas fa-shield-halved"></i> Polícia Civil
+                        </a>
+                    </li>
                 </ul>
                 <div class="tab-content pt-3" id="tema-demografia">
                     <?php $first = true; foreach ($mapas as $categoria => $itens): ?>
@@ -224,6 +230,47 @@ function fmt_num($v, $decimais = 0) {
 
                         <p class="footer-note text-muted small mt-4">
                             Fonte: Relatório de Atividades do Ministério Público do Estado do Pará (MPPA), ano base 2023/2024, submetido à ALEPA.
+                        </p>
+                    </div>
+
+                    <div class="tab-pane fade" id="painel-policia-civil">
+                        <p class="text-muted">Polícia Civil do Estado do Pará (PCPA) — Unidades Policiais (pc.pa.gov.br/delegacias).</p>
+
+                        <?php foreach ($pcpaEstado as $tipo => $itens): ?>
+                            <button class="btn btn-sm btn-outline-secondary mt-2 mr-1" type="button" data-toggle="collapse"
+                                    data-target="#pcpa-<?= md5($tipo) ?>">
+                                <i class="fas fa-chevron-down"></i> <?= htmlspecialchars($tipo) ?> (<?= count($itens) ?>)
+                            </button>
+                            <div class="collapse mt-2" id="pcpa-<?= md5($tipo) ?>">
+                                <?php foreach ($itens as $u): ?>
+                                    <div class="card card-outline card-secondary mb-2">
+                                        <div class="card-body py-2">
+                                            <h6 class="mb-1">
+                                                <?= htmlspecialchars($u['nome']) ?>
+                                                <?php if ($u['ibge_code']): ?>
+                                                    <a class="small" href="index.php?page=municipio&codigo=<?= htmlspecialchars($u['ibge_code']) ?>">(<?= htmlspecialchars($u['municipio_nome']) ?>)</a>
+                                                <?php endif; ?>
+                                            </h6>
+                                            <?php if ($u['endereco']): ?>
+                                                <p class="mb-1 small"><i class="fas fa-location-dot"></i>
+                                                    <?= htmlspecialchars($u['endereco']) ?><?= $u['bairro'] ? ' — ' . htmlspecialchars($u['bairro']) : '' ?>
+                                                </p>
+                                            <?php endif; ?>
+                                            <?php if ($u['telefone']): ?>
+                                                <p class="mb-1 small"><i class="fas fa-phone"></i> <?= htmlspecialchars($u['telefone']) ?></p>
+                                            <?php endif; ?>
+                                            <?php if ($u['funcionamento']): ?>
+                                                <p class="mb-0 small text-muted"><i class="fas fa-clock"></i> <?= htmlspecialchars($u['funcionamento']) ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <p class="footer-note text-muted small mt-4">
+                            Fonte: Polícia Civil do Estado do Pará — Unidades Policiais (pc.pa.gov.br/delegacias).
+                            Dados extraídos automaticamente por OCR e podem conter pequenas imprecisões.
                         </p>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 /** @var array $indicadores */
 /** @var array $politica */
 /** @var array $mppa */
+/** @var array $pcpa */
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -112,6 +113,23 @@ ob_start();
     <?php endforeach; ?>
 <?php endif; ?>
 
+<?php if ($pcpa): ?>
+    <h2>Polícia Civil do Pará (PCPA)</h2>
+    <table>
+        <thead><tr><th>Tipo</th><th>Unidade</th><th>Endereço</th><th>Telefone</th></tr></thead>
+        <tbody>
+        <?php foreach ($pcpa as $u): ?>
+            <tr>
+                <td><?= htmlspecialchars($u['tipo']) ?></td>
+                <td><?= htmlspecialchars($u['nome']) ?></td>
+                <td><?= htmlspecialchars($u['endereco'] ?? '') ?><?= $u['bairro'] ? ' — ' . htmlspecialchars($u['bairro']) : '' ?></td>
+                <td><?= htmlspecialchars($u['telefone'] ?? '') ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
+
 <?php foreach ($indicadores as $tema => $porSubtema): ?>
     <h2><?= htmlspecialchars($tema) ?></h2>
     <?php foreach ($porSubtema as $subtema => $porIndicador): ?>
@@ -138,7 +156,7 @@ ob_start();
 
 <p class="footer-note">
     Fontes: Anuário Estatístico do Pará 2025, Justiça Eleitoral/TSE (Eleições Municipais 2024), IBGE,
-    Relatório de Atividades do MPPA (ano base 2023/2024).
+    Relatório de Atividades do MPPA (ano base 2023/2024), Polícia Civil do Pará (pc.pa.gov.br/delegacias).
     Relatório gerado automaticamente pelo Anuário do Pará — uso interno, não substitui as fontes oficiais.
 </p>
 

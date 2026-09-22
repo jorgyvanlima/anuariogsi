@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends poppler-utils \
+    && apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-por \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY etl/requirements.txt /app/requirements.txt

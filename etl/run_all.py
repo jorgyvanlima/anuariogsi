@@ -10,6 +10,7 @@ import load_anuario
 import load_mapas
 import load_politicos
 import load_mppa
+import load_pcpa
 
 
 def main():
@@ -29,6 +30,9 @@ def main():
 
         print("[run_all] carregando dados do Ministério Público (MPPA)...")
         load_mppa.run(conn)
+
+        print("[run_all] carregando unidades da Polícia Civil (PCPA)...")
+        load_pcpa.run(conn)
 
         print("[run_all] carga concluída com sucesso.")
     except Exception:
